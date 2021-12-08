@@ -1,0 +1,12 @@
+{
+    "name": "headlesslaravel/metrics",
+    "description": "Metrics helper for Headless Laravel",
+    "type": "library",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Brian Dillingham",
+            "email": "brian@dillingham.dev"
+        }
+    ]
+}
