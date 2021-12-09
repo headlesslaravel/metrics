@@ -13,13 +13,13 @@ use Illuminate\Support\Collection;
 
 class Metric
 {
-    public string $interval;
+    public $interval;
 
     public $from;
 
     public $to;
 
-    public string $dateColumn = 'created_at';
+    public $dateColumn = 'created_at';
 
     public function __construct(public Builder $builder)
     {
