@@ -2,7 +2,7 @@
 
 namespace HeadlessLaravel\Metrics;
 
-class MetricValue
+class MetricResult
 {
     public function __construct(
         public string $date,

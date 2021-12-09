@@ -21,6 +21,12 @@ Metric::make(Post::class)
     ->count()
 ```
 
+or add the `HasMetrics` trait to a model and use like so:
+```php
+Post::metrics()
+    ->from(now()->subDays(7))
+    ->count()
+```
 ## Credits
 
 Special thanks to @Larsklopstra for his [Flowframe/laravel-trend](https://github.com/Flowframe/laravel-trend) package. 

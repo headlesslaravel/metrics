@@ -10,6 +10,7 @@ use HeadlessLaravel\Metrics\Adapters\SqliteAdapter;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Request;
 
 class Metric
 {
@@ -34,10 +35,38 @@ class Metric
         return new static($model);
     }
 
-    public function between(array $range): self
+    public function filter($key): self
     {
-        $this->from = $range[0];
-        $this->to = $range[1];
+        if(is_array($key)) {
+            foreach ($key as $k) {
+                $this->filter($k);
+            }
+
+            return $this;
+        }
+
+        $this->builder->when(Request::filled($key), function($query) use($key) {
+            $query->where($key, Request::input($key));
+        });
+
+        return $this;
+    }
+
+    public function filterDates($from = 'from', $to = 'to'): self
+    {
+        $this->builder->when(Request::filled($from), function($query) use($from, $to) {
+            $query->whereBetween($this->dateColumn, [
+                Request::input($from),
+                Request::input($to, Carbon::now()),
+            ]);
+        });
+
+        return $this;
+    }
+
+    public function where(...$arguments): self
+    {
+        $this->builder->where(...$arguments);
 
         return $this;
     }
@@ -63,27 +92,27 @@ class Metric
         return $this;
     }
 
-    public function minutes(): self
+    public function byMinute(): self
     {
         return $this->interval('minutes');
     }
 
-    public function hours(): self
+    public function byHour(): self
     {
         return $this->interval('hours');
     }
 
-    public function days(): self
+    public function byDay(): self
     {
         return $this->interval('days');
     }
 
-    public function months(): self
+    public function byMonth(): self
     {
         return $this->interval('months');
     }
 
-    public function years(): self
+    public function byYear(): self
     {
         return $this->interval('years');
     }
@@ -102,7 +131,11 @@ class Metric
         }
 
         if(is_null($this->from)) {
-            $this->from = Carbon::today()->subYears(1000);
+            $this->from = Carbon::today()->subYears(100);
+        }
+
+        if(is_null($this->interval)) {
+            $this->interval('years');
         }
 
         $values = $this->builder
@@ -146,7 +179,7 @@ class Metric
 
     public function mapValuesToDates(Collection $values): Collection
     {
-        $values = $values->map(fn ($value) => new MetricValue(
+        $values = $values->map(fn ($value) => new MetricResult(
             date: $value->date,
             aggregate: $value->aggregate,
         ));
@@ -154,7 +187,7 @@ class Metric
         $format = $this->getCarbonDateFormat();
 
         $placeholders = $this->getDatePeriod()->map(
-            fn (Carbon $date) => new MetricValue(
+            fn (Carbon $date) => new MetricResult(
                 date: $date->format($format),
                 aggregate: 0,
             )
