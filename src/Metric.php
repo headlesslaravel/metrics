@@ -15,9 +15,9 @@ class Metric
 {
     public string $interval;
 
-    public Carbon $from;
+    public $from;
 
-    public Carbon $to;
+    public $to;
 
     public string $dateColumn = 'created_at';
 
