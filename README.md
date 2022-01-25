@@ -9,23 +9,14 @@
 
 ## Installation
 
-You can install the package via composer:
+This package is included when `headlesslaravel` is installed.
+
+Or install the package independently via composer:
 
 ```bash
 composer require headlesslaravel/metrics
 ```
 
-```php
-Metric::make(Post::class)
-    ->from(now()->subDays(7))
-    ->count()
-```
-or add the `HasMetrics` trait to a model and use like so:
-```php
-Post::metrics()
-    ->from(now()->subDays(7))
-    ->count()
-```
 ## Credits
 
 Special thanks to @Larsklopstra for his [Flowframe/laravel-trend](https://github.com/Flowframe/laravel-trend) package. 
