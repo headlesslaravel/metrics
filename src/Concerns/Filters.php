@@ -7,19 +7,11 @@ use Illuminate\Support\Facades\Request;
 
 trait Filters
 {
-    public function filter($key): self
+    public $filters = [];
+
+    public function filters(array $filters): self
     {
-        if(is_array($key)) {
-            foreach ($key as $k) {
-                $this->filter($k);
-            }
-
-            return $this;
-        }
-
-        $this->builder->when(Request::filled($key), function($query) use($key) {
-            $query->where($key, Request::input($key));
-        });
+        $this->filters = $filters;
 
         return $this;
     }

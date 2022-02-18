@@ -4,7 +4,7 @@ namespace HeadlessLaravel\Metrics\Concerns;
 
 use Illuminate\Support\Carbon;
 
-trait From
+trait Periods
 {
     public function from(Carbon $from): self
     {

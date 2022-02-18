@@ -13,11 +13,13 @@ use Illuminate\Support\Collection;
 
 class Metric
 {
-    use Concerns\From;
+    use Concerns\Periods;
     use Concerns\Filters;
     use Concerns\Outputs;
     use Concerns\Intervals;
     use Concerns\Aggregates;
+
+    public $builder;
 
     public $interval;
 
@@ -27,17 +29,47 @@ class Metric
 
     public $dateColumn = 'created_at';
 
-    public function __construct(public Builder $builder)
+    public static function new():self
     {
+        return new static();
     }
 
-    public static function make(mixed $model): self
+    public static function make($model): self
     {
+        $metric = static::new();
+
         if(is_string($model)) {
             $model = $model::query();
         }
 
-        return new static($model);
+        $metric->builder = $model;
+
+        return $metric;
+    }
+
+    public function makeMany(array $metrics): array
+    {
+        $results = [];
+
+        // TODO: need to apply intervals, periods, filters etc to each
+        foreach($metrics as $metric) {
+            $results[] = $metric->render();
+        }
+
+        return $results;
+    }
+
+    public function render()
+    {
+        return $this->aggregate(
+            $this->aggregateColumn,
+            $this->aggregate
+        );
+    }
+
+    public function withPrevious(): self
+    {
+        return $this;
     }
 
     protected function fallbacks()
@@ -126,5 +158,10 @@ class Metric
             'year' => 'Y',
             default => throw new Error('Invalid interval.'),
         };
+    }
+
+    public function __destruct()
+    {
+        return $this->render();
     }
 }

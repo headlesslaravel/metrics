@@ -6,10 +6,55 @@ use Illuminate\Support\Collection;
 
 trait Aggregates
 {
-    public function aggregate(string $column, string $aggregate):mixed
+    protected $aggregate;
+
+    protected $aggregateColumn;
+
+    public function avg(string $column): self
+    {
+        $this->aggregate = 'avg';
+        $this->aggregateColumn = $column;
+
+        return $this;
+    }
+
+    public function min(string $column): self
+    {
+        $this->aggregate = 'min';
+        $this->aggregateColumn = $column;
+
+        return $this;
+    }
+
+    public function max(string $column): self
+    {
+        $this->aggregate = 'max';
+        $this->aggregateColumn = $column;
+
+        return $this;
+    }
+
+    public function sum(string $column): self
+    {
+        $this->aggregate = 'sum';
+        $this->aggregateColumn = $column;
+
+        return $this;
+    }
+
+    public function count(string $column = '*'): self
+    {
+        $this->aggregate = 'count';
+        $this->aggregateColumn = $column;
+
+        return $this;
+    }
+
+    protected function aggregate(string $column, string $aggregate):mixed
     {
         $this->fallbacks();
 
+        // TODO: move outside of aggregate trait // unrelated
         $builder = $this->builder
             ->toBase()
             ->whereBetween($this->dateColumn, [$this->from, $this->to]);
@@ -28,30 +73,5 @@ trait Aggregates
             ->get();
 
         return $this->mapValuesToDates($values);
-    }
-
-    public function average(string $column):mixed
-    {
-        return $this->aggregate($column, 'avg');
-    }
-
-    public function min(string $column):mixed
-    {
-        return $this->aggregate($column, 'min');
-    }
-
-    public function max(string $column):mixed
-    {
-        return $this->aggregate($column, 'max');
-    }
-
-    public function sum(string $column):mixed
-    {
-        return $this->aggregate($column, 'sum');
-    }
-
-    public function count(string $column = '*'):mixed
-    {
-        return $this->aggregate($column, 'count');
     }
 }
